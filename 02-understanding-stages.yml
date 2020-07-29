@@ -15,7 +15,8 @@ stages:
     - bash: echo $(PipelineLevelVariable)
     - bash: echo $(Build.BuildNumber)
     - bash: echo $(Build.SourceBranchName)
-    - bash: echo $(Build.SourceDirector)
+    - bash: echo $(Build.SourceDirectory)
+    - bash: echo $(System.DefaultWorkingDirectory)
     - bash: ls -R echo $(System.DefaultWorkingDirectory)
     - bash: echo $(Build.ArtifactStagingDirectory)
 
