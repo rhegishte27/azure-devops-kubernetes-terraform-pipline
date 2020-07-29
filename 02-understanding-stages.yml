@@ -27,12 +27,13 @@ stages:
     - bash: echo $(environment)DeployJob
 
 - stage: QADeploy
-  variables: QA
+  variables: 
+    environment: QA
   dependsOn: Build
   jobs:
   - job: QADeployJob
     steps:
-    - bash: echo $(variables)DeployJob
+    - bash: echo $(environment)DeployJob
 
 
 - stage: ProdDeploy
