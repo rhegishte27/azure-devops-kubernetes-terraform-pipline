@@ -1,83 +1,96 @@
-# aws --version
-# aws eks --region us-east-1 update-kubeconfig --name rupeshh-cluster
-# Uses default VPC and Subnet. Create Your Own VPC and Private Subnets for Prod Usage.
-# terraform-backend-state-rupesh01
-# AKIAYIJETJ6IAFBTXPU5
+resource "aws_iam_role" "eks_cluster" {
+  name = "eks-cluster"
 
-
-terraform {
-  backend "s3" {
-    bucket = "mybucket" # Will be overridden from build
-    key    = "path/to/my/key" # Will be overridden from build
-    region = "ap-south-1"
-  }
-}
-
-resource "aws_default_vpc" "default" {
-
-}
-
-data "aws_subnet_ids" "subnets" {
-  vpc_id = aws_default_vpc.default.id
-}
-
-provider "kubernetes" {
-  host                   = data.aws_eks_cluster.cluster.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
-  token                  = data.aws_eks_cluster_auth.cluster.token
-  load_config_file       = false
-  version                = "~> 1.9"
-}
-
-module "rupeshh-cluster" {
-  source          = "terraform-aws-modules/eks/aws"
-  cluster_name    = "rupeshh-cluster"
-  cluster_version = "1.14"
-  subnets         = ["subnet-099f6465e0c5a4294", "subnet-02a5d1fb27edea60e"] #CHANGE
-  #subnets = data.aws_subnet_ids.subnets.ids
-  #vpc_id          = aws_default_vpc.default.id
-  vpc_id         = "vpc-0383259062619af05"
-
-  node_groups = [
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
     {
-      instance_type = "t2.micro"
-      max_capacity  = 3
-      desired_capacity = 1
-      min_capacity  = 1
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "eks.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
     }
   ]
 }
-
-data "aws_eks_cluster" "cluster" {
-  name = module.rupeshh-cluster.cluster_id
+POLICY
 }
 
-data "aws_eks_cluster_auth" "cluster" {
-  name = module.rupeshh-cluster.cluster_id
+resource "aws_iam_role_policy_attachment" "AmazonEKSClusterPolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  role       = aws_iam_role.eks_cluster.name
 }
 
+resource "aws_iam_role_policy_attachment" "AmazonEKSServicePolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+  role       = aws_iam_role.eks_cluster.name
+}
 
-# We will use ServiceAccount to connect to K8S Cluster in CI/CD mode
-# ServiceAccount needs permissions to create deployments 
-# and services in default namespace
-resource "kubernetes_cluster_role_binding" "example" {
-  metadata {
-    name = "fabric8-rbac"
+resource "aws_eks_cluster" "aws_eks" {
+  name     = "eks_cluster_tuto"
+  role_arn = aws_iam_role.eks_cluster.arn
+
+  vpc_config {
+    subnet_ids = ["subnet-099f6465e0c5a4294", "subnet-02a5d1fb27edea60e"]
   }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = "cluster-admin"
-  }
-  subject {
-    kind      = "ServiceAccount"
-    name      = "default"
-    namespace = "default"
+
+  tags = {
+    Name = "EKS_tuto"
   }
 }
 
-# Needed to set the default region
-provider "aws" {
-  region  = "ap-south-1"
-  version = "~> 3.0"
+resource "aws_iam_role" "eks_nodes" {
+  name = "eks-node-group-tuto"
+
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_iam_role_policy_attachment" "AmazonEKSWorkerNodePolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role       = aws_iam_role.eks_nodes.name
+}
+
+resource "aws_iam_role_policy_attachment" "AmazonEKS_CNI_Policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = aws_iam_role.eks_nodes.name
+}
+
+resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.eks_nodes.name
+}
+
+resource "aws_eks_node_group" "node" {
+  cluster_name    = aws_eks_cluster.aws_eks.name
+  node_group_name = "node_tuto"
+  node_role_arn   = aws_iam_role.eks_nodes.arn
+  subnet_ids      = ["subnet-099f6465e0c5a4294", "subnet-02a5d1fb27edea60e"]
+
+  scaling_config {
+    desired_size = 1
+    max_size     = 1
+    min_size     = 1
+  }
+
+  # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
+  # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
+  depends_on = [
+    aws_iam_role_policy_attachment.AmazonEKSWorkerNodePolicy,
+    aws_iam_role_policy_attachment.AmazonEKS_CNI_Policy,
+    aws_iam_role_policy_attachment.AmazonEC2ContainerRegistryReadOnly,
+  ]
 }
