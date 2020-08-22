@@ -35,9 +35,8 @@ module "rupeshh-cluster" {
   cluster_version = "1.14"
   subnets         = ["subnet-099f6465e0c5a4294", "subnet-02a5d1fb27edea60e"] #CHANGE
   #subnets = data.aws_subnet_ids.subnets.ids
-  vpc_id          = aws_default_vpc.default.id
-
-  #vpc_id         = "vpc-1234556abcdef"
+  #vpc_id          = aws_default_vpc.default.id
+  vpc_id         = "vpc-0383259062619af05"
 
   node_groups = [
     {
