@@ -33,7 +33,7 @@ module "rupeshh-cluster" {
   source          = "terraform-aws-modules/eks/aws"
   cluster_name    = "rupeshh-cluster"
   cluster_version = "1.14"
-  subnets         = ["subnet-099f6465e0c5a4294", "subnet-096f8525041397428"] #CHANGE
+  subnets         = ["subnet-099f6465e0c5a4294", "subnet-02a5d1fb27edea60e"] #CHANGE
   #subnets = data.aws_subnet_ids.subnets.ids
   vpc_id          = aws_default_vpc.default.id
 
