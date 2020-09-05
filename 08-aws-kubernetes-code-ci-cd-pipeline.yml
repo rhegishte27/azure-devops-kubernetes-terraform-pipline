@@ -55,7 +55,7 @@ stages:
         awsCredentials: 'aws-master-account-service-connection'
         regionName: 'ap-south-1'
         awsCommand: 'eks'
-        awsSubCommand: '--region ap-south-1 update-kubeconfig --name=eks_cluster_tuto'
+        awsSubCommand: 'update-kubeconfig --name=eks_cluster_tuto'
         
     - task: KubernetesManifest@0
       inputs:
