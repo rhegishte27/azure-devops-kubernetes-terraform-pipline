@@ -64,6 +64,8 @@ stages:
         kubernetesServiceEndpoint: 'aws-kubernetes-cluster-service-connection'
         namespace: 'default'
         command: 'apply'
+        useConfigurationFile: true
+        configuration: '$(System.ArtifactsDirectory)/configuration/kubernetes/'
         secretType: 'generic'
         workingDirectory: '$(System.ArtifactsDirectory)/configuration/kubernetes/'
     # - task: KubernetesManifest@0
