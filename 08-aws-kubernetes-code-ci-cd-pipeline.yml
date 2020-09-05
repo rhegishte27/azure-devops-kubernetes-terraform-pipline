@@ -7,6 +7,9 @@ resources:
 variables:
   tag: 63
   #'$(Build.BuildId)'
+  AWS_ACCESS_KEY_ID: $(AWS.AccessKeyID)
+  AWS.AccessKeyID: $(AWS.SecretAccessKey)
+  
 
 stages:
 - stage: Build
@@ -49,10 +52,14 @@ stages:
         artifactName: 'manifests'
         itemPattern: '**/*.yaml'
         targetPath: '$(System.ArtifactsDirectory)'
+    - task: AWSCLI@1
+      inputs:
+        regionName: 'ap-south-1'
+        awsCommand: 'aws eks --region ap-south-1 update-kubeconfig --name=eks_cluster_tuto'
     - task: KubernetesManifest@0
       inputs:
         action: 'deploy'
-        kubernetesServiceConnection: 'aws-kubernetes-cluster-service-connection'
+        #kubernetesServiceConnection: 'aws-kubernetes-cluster-service-connection'
         namespace: 'default'
         manifests: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
         containers: changa2127/currency-exchange-devops:$(tag)
