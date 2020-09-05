@@ -58,18 +58,11 @@ stages:
         awsSubCommand: 'update-kubeconfig'
         awsArguments: '--name eks_cluster_tuto'
         failOnStandardError: true
-    - task: Kubernetes@1
+
+    - task: KubernetesManifest@0
       inputs:
-        connectionType: 'Kubernetes Service Connection'
-        kubernetesServiceEndpoint: 'aws-kubernetes-cluster-service-connection'
-        command: 'get'
-        arguments: 'all -o wide'
-        secretType: 'generic'
-        forceUpdate: false
-    # - task: KubernetesManifest@0
-    #   inputs:
-    #     action: 'deploy'
-    #     kubernetesServiceConnection: 'aws-kubernetes-cluster-service-connection'
-    #     namespace: 'default'
-    #     manifests: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
-    #     containers: changa2127/currency-exchange-devops:$(tag)
+        action: 'deploy'
+        kubernetesServiceConnection: 'aws-kubernetes-cluster-service-connection'
+        namespace: 'default'
+        manifests: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
+        containers: 'changa2127/currency-exchange-devops:63'
