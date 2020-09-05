@@ -7,8 +7,6 @@ resources:
 variables:
   tag: 63
   #'$(Build.BuildId)'
-  AWS_ACCESS_KEY_ID: $(AWS.AccessKeyID)
-  AWS.AccessKeyID: $(AWS.SecretAccessKey)
   
 
 stages:
@@ -54,6 +52,7 @@ stages:
         targetPath: '$(System.ArtifactsDirectory)'
     - task: AWSCLI@1
       inputs:
+        awsCredentials: 'aws-master-account-service-connection'
         regionName: 'ap-south-1'
         awsCommand: 'aws eks --region ap-south-1 update-kubeconfig --name=eks_cluster_tuto'
     - task: KubernetesManifest@0
