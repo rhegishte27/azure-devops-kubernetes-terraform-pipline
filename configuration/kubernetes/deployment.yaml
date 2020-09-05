@@ -4,6 +4,7 @@ metadata:
   labels:
     app: currency-exchange
   name: currency-exchange
+  namespace: default
 spec:
   replicas: 1 #CHANGE
   minReadySeconds: 45
@@ -50,3 +51,21 @@ spec:
           initialDelaySeconds: 60
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels: #PODS
+    app: currency-exchange
+  name: currency-exchange
+  namespace: default
+spec:
+  ports:
+  - # nodePort: 30702 #CHANGE
+    port: 8000 #CHANGE
+    protocol: TCP
+    targetPort: 8000 #CHANGE
+  selector:
+    app: currency-exchange
+  sessionAffinity: None #CHANGE
+  type: LoadBalancer
