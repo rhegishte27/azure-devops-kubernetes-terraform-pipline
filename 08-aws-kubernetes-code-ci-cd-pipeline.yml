@@ -63,6 +63,5 @@ stages:
       inputs:
         action: 'deploy'
         kubernetesServiceConnection: 'aws-kubernetes-cluster-service-connection'
-        namespace: 'default'
         manifests: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
         containers: 'changa2127/currency-exchange-devops:63'
