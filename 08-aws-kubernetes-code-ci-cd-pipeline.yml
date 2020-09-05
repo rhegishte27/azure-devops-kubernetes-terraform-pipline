@@ -73,7 +73,6 @@ stages:
           
           #Apply
           kubectl delete -f $1
-          sleep 15
           kubectl apply -f $1
     # - task: AWSCLI@1
     #   inputs:
