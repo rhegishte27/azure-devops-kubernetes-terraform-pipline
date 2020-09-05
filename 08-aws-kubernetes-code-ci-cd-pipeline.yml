@@ -65,7 +65,7 @@ stages:
         namespace: 'default'
         command: 'apply'
         useConfigurationFile: true
-        configuration: '$(System.ArtifactsDirectory)/configuration/kubernetes/'
+        configuration: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
         secretType: 'generic'
         workingDirectory: '$(System.ArtifactsDirectory)/configuration/kubernetes/'
     # - task: KubernetesManifest@0
