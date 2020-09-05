@@ -66,8 +66,11 @@ stages:
         command: 'apply'
         useConfigurationFile: true
         configuration: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
-        secretType: 'generic'
-        workingDirectory: '$(System.ArtifactsDirectory)/configuration/kubernetes/'
+        secretType: 'dockerRegistry'
+        containerRegistryType: 'Container Registry'
+        dockerRegistryEndpoint: 'hegishtedockerhub'
+        workingDirectory: 
+        outputFormat: 'none'
     # - task: KubernetesManifest@0
     #   inputs:
     #     action: 'deploy'
