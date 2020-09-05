@@ -56,7 +56,7 @@ stages:
         regionName: 'ap-south-1'
         awsCommand: 'eks update-kubeconfig'
         awsSubCommand: '--name=eks_cluster_tuto'
-        #awsSubCommand: 'aws eks --region ap-south-1 update-kubeconfig --name=eks_cluster_tuto'
+        
     - task: KubernetesManifest@0
       inputs:
         action: 'deploy'
