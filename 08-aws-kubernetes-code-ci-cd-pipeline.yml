@@ -50,18 +50,41 @@ stages:
         artifactName: 'manifests'
         itemPattern: '**/*.yaml'
         targetPath: '$(System.ArtifactsDirectory)'
-    - task: AWSCLI@1
+    - task: AWSShellScript@1
       inputs:
         awsCredentials: 'aws-master-account-service-connection'
         regionName: 'ap-south-1'
-        awsCommand: 'eks'
-        awsSubCommand: 'update-kubeconfig'
-        awsArguments: '--name eks_cluster_tuto'
-        failOnStandardError: true
-
-    - task: KubernetesManifest@0
-      inputs:
-        action: 'deploy'
-        kubernetesServiceConnection: 'aws-kubernetes-cluster-service-connection'
-        manifests: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
-        containers: 'changa2127/currency-exchange-devops:63'
+        arguments: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
+        scriptType: 'inline'
+        inlineScript: |
+          sudo pip install setuptools
+          sudo pip install wheel
+          sudo pip install awscli --upgrade
+          
+          #Kubectl
+          sudo curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          sudo chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+          
+          #AWS Configuration
+          aws configure set aws-access-key $(AWS.AccessKeyID) 
+          aws configure set aws_secret_access_key $(AWS.SecretAccessKey)
+          aws eks --region ap-south-1 update-kubeconfig --name=eks_cluster_tuto
+          
+          #Apply
+          kubectl apply -f $1
+    # - task: AWSCLI@1
+    #   inputs:
+    #     awsCredentials: 'aws-master-account-service-connection'
+    #     regionName: 'ap-south-1'
+    #     awsCommand: 'eks'
+    #     awsSubCommand: 'update-kubeconfig'
+    #     awsArguments: '--name eks_cluster_tuto'
+    #     failOnStandardError: true
+    
+    # - task: KubernetesManifest@0
+    #   inputs:
+    #     action: 'deploy'
+    #     kubernetesServiceConnection: 'aws-kubernetes-cluster-service-connection'
+    #     manifests: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
+    #     containers: 'changa2127/currency-exchange-devops:63'
