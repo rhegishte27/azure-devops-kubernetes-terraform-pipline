@@ -62,15 +62,10 @@ stages:
       inputs:
         connectionType: 'Kubernetes Service Connection'
         kubernetesServiceEndpoint: 'aws-kubernetes-cluster-service-connection'
-        namespace: 'default'
-        command: 'apply'
-        useConfigurationFile: true
-        configuration: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
-        secretType: 'dockerRegistry'
-        containerRegistryType: 'Container Registry'
-        dockerRegistryEndpoint: 'hegishtedockerhub'
-        workingDirectory: 
-        outputFormat: 'none'
+        command: 'get'
+        arguments: 'all -o wide'
+        secretType: 'generic'
+        forceUpdate: false
     # - task: KubernetesManifest@0
     #   inputs:
     #     action: 'deploy'
