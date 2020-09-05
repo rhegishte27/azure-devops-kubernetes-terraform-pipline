@@ -72,6 +72,8 @@ stages:
           aws eks --region ap-south-1 update-kubeconfig --name=eks_cluster_tuto
           
           #Apply
+          kubectl delete -f $1
+          sleep 15
           kubectl apply -f $1
     # - task: AWSCLI@1
     #   inputs:
