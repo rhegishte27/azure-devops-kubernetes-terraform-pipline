@@ -58,11 +58,10 @@ stages:
         awsSubCommand: 'update-kubeconfig'
         awsArguments: '--name eks_cluster_tuto'
         failOnStandardError: true
-        
     - task: KubernetesManifest@0
       inputs:
         action: 'deploy'
-        #kubernetesServiceConnection: 'aws-kubernetes-cluster-service-connection'
+        kubernetesServiceConnection: 'aws-kubernetes-cluster-service-connection'
         namespace: 'default'
         manifests: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
         containers: changa2127/currency-exchange-devops:$(tag)
