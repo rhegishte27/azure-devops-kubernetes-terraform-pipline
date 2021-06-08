@@ -52,7 +52,7 @@ stages:
       - task: KubernetesManifest@0
         inputs:
           action: 'deploy'
-          kubernetesServiceConnection: 'azure-kubernetes-connection'
+          kubernetesServiceConnection: 'aure-rke-cluster01-rancher'
           namespace: 'default'
           manifests: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
           containers: 'changa2127/currency-exchange-devops:$(tag)'
