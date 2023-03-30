@@ -5,20 +5,34 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-  - script: echo Hello, World!
-    displayName: 'Run a one-line script'
+  - script: echo k8S Terraform Azure
+    displayName: 'Run a one-line script!'
 
-  - task: TerraformTaskV1@0
+  - task: DownloadSecureFile@1
+    name: publickey
     inputs:
-      provider: 'aws'
+      secureFile: 'azure_rsa.pub'
+
+  - task: TerraformTaskV4@4
+    inputs:
+      provider: 'azurerm'
       command: 'init'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/aws/kubernetes'
-      backendServiceAWS: 'aws-for-terraform'
-      backendAWSBucketName: 'terraform-backend-state-rupesh01'
-      backendAWSKey: 'kubernetes-dev.tfstate'
-  - task: TerraformTaskV1@0
+      workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/azure/kubernetes'
+      backendServiceArm: 'APPS_LSH iGovern-sa'
+      backendAzureRmResourceGroupName: 'igovern-devops'
+      backendAzureRmStorageAccountName: 'igovern'
+      backendAzureRmContainerName: 'aks'
+      backendAzureRmKey: 'tfstate'
+
+
+  - task: TerraformTaskV4@4
     inputs:
-      provider: 'aws'
+      provider: 'azurerm'
       command: 'apply'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/aws/kubernetes'
-      environmentServiceNameAWS: 'aws-for-terraform'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/azure/kubernetes'
+      commandOptions: '-var client_id=$(client_id) -var client_secret=$(client_secret)'
+      environmentServiceNameAzureRM: 'APPS_LSH iGovern-sa'
+
+
+      
+
