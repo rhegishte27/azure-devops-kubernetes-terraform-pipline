@@ -8,29 +8,41 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_kubernetes_cluster" "terraform-k8s" {
-  name                = "${var.cluster_name}_${var.environment}"
-  location            = azurerm_resource_group.resource_group.location
-  resource_group_name = azurerm_resource_group.resource_group.name
-  dns_prefix          = var.dns_prefix
+resource "azurerm_resource_group" "example" {
+  name     = "example-resources"
+  location = "West Europe"
+}
 
-
-  }
+resource "azurerm_kubernetes_cluster" "example" {
+  name                = "example-aks1"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  dns_prefix          = "exampleaks1"
 
   default_node_pool {
-    name            = "agentpool"
-    node_count      = var.node_count
-    vm_size         = "Standard_DS1_v2"
+    name       = "default"
+    node_count = 1
+    vm_size    = "Standard_D2_v2"
   }
 
-  service_principal {
-    client_id     = var.client_id
-    client_secret = var.client_secret
+  identity {
+    type = "SystemAssigned"
   }
 
   tags = {
-    Environment = var.environment
+    Environment = "Production"
   }
+}
+
+output "client_certificate" {
+  value     = azurerm_kubernetes_cluster.example.kube_config.0.client_certificate
+  sensitive = true
+}
+
+output "kube_config" {
+  value = azurerm_kubernetes_cluster.example.kube_config_raw
+
+  sensitive = true
 }
 
 terraform {
