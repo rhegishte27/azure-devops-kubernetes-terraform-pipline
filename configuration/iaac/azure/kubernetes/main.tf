@@ -20,7 +20,10 @@ resource "azurerm_kubernetes_cluster" "example" {
     node_count = 1
     vm_size    = "Standard_D2_v2"
   }
-
+  service_principal {
+    client_id     = var.client_id
+    client_secret = var.client_secret
+  }
   identity {
     type = "SystemAssigned"
   }
