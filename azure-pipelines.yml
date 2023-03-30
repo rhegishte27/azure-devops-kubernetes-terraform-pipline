@@ -28,7 +28,7 @@ steps:
   - task: TerraformTaskV4@4
     inputs:
       provider: 'azurerm'
-      command: 'apply'
+      command: 'destor'
       workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/azure/kubernetes'
       commandOptions: '-var client_id=$(client_id) -var client_secret=$(client_secret)'
       environmentServiceNameAzureRM: 'APPS_LSH iGovern-sa'
