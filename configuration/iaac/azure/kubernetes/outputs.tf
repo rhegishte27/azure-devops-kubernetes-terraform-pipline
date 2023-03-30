@@ -26,8 +26,8 @@
 #   value = azurerm_kubernetes_cluster.terraform-k8s.kube_config.0.host
 # }
 
-output "kube_config" {
-  value = azurerm_kubernetes_cluster.example.kube_config_raw
+# output "kube_config" {
+#   value = azurerm_kubernetes_cluster.example.kube_config_raw
 
-  sensitive = true
-}
+#   sensitive = true
+# }
