@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-  - script: echo k8S Terraform Azure
+  - script: echo Azure VM Creation Terraform Azure
     displayName: 'Run a one-line script!'
 
   - task: DownloadSecureFile@1
@@ -17,21 +17,19 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'init'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/azure/kubernetes'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/azure/vm'
       backendServiceArm: 'APPS_LSH iGovern-sa'
       backendAzureRmResourceGroupName: 'igovern-devops'
       backendAzureRmStorageAccountName: 'igovern'
       backendAzureRmContainerName: 'aks'
-      backendAzureRmKey: 'tfstate'
-
-
+      backendAzureRmKey: 'tfstate-vm'
   - task: TerraformTaskV4@4
     inputs:
       provider: 'azurerm'
-      command: 'destroy'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/azure/kubernetes'
-      commandOptions: '-var client_id=$(client_id) -var client_secret=$(client_secret)'
+      command: 'apply'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/azure/vm'
       environmentServiceNameAzureRM: 'APPS_LSH iGovern-sa'
+
 
 
       
