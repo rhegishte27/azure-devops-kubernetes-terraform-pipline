@@ -1,0 +1,38 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - script: echo k8S Terraform Azure
+    displayName: 'Run a one-line script!'
+
+  - task: DownloadSecureFile@1
+    name: publickey
+    inputs:
+      secureFile: 'azure_rsa.pub'
+
+  - task: TerraformTaskV4@4
+    inputs:
+      provider: 'azurerm'
+      command: 'init'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/azure/kubernetes'
+      backendServiceArm: 'APPS_LSH iGovern-sa'
+      backendAzureRmResourceGroupName: 'igovern-devops'
+      backendAzureRmStorageAccountName: 'igovern'
+      backendAzureRmContainerName: 'aks'
+      backendAzureRmKey: 'tfstate'
+
+
+  - task: TerraformTaskV4@4
+    inputs:
+      provider: 'azurerm'
+      command: 'destroy'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/azure/kubernetes'
+      commandOptions: '-var client_id=$(client_id) -var client_secret=$(client_secret)'
+      environmentServiceNameAzureRM: 'APPS_LSH iGovern-sa'
+
+
+      
+
